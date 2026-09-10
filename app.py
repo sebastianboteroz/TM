@@ -15,11 +15,13 @@ st.set_page_config(
 # --- CARGA DEL MODELO Y LABELS ---
 @st.cache_resource
 def cargar_modelo():
-    # Cargar modelo sin compilar para evitar advertencias de Keras
-    model = load_model("keras_Model.h5", compile=False)
-    # Cargar etiquetas
+    # Nombre exacto como aparece en tu repositorio de GitHub (m minúscula)
+    model = load_model("keras_model.h5", compile=False)
+
+    # Cargar etiquetas desde labels.txt
     with open("labels.txt", "r") as f:
         class_names = [line.strip() for line in f.readlines()]
+
     return model, class_names
 
 
@@ -32,7 +34,7 @@ st.write(
 )
 
 with st.sidebar:
-    st.subheader("Verificación Biometrica")
+    st.subheader("Verificación Biométrica")
     st.write(
         "Este sistema valida si eres **Sebastián** antes de habilitar el formulario."
     )
@@ -57,25 +59,25 @@ if img_file_buffer is not None:
     normalized_image_array = (image_array.astype(np.float32) / 127.5) - 1
     data[0] = normalized_image_array
 
-    # Predicts the model
+    # Predicción
     prediction = model.predict(data)
     index = np.argmax(prediction)
     class_name = class_names[index]
     confidence_score = float(prediction[0][index])
 
-    # Nombre limpio de la clase (quita el "0 " o "1 ")
+    # Limpiar nombre de la clase (quita el "0 " o "1 ")
     nombre_clase = class_name.split(" ", 1)[-1] if " " in class_name else class_name
 
     # --- EVALUACIÓN DE IDENTIDAD ---
-    # Si el índice predicho es 0 ("sebastian") y tiene más de 70% de confianza
-    if index == 0 and confidence_score > 0.70:
+    # Si detecta la clase 0 ("sebastian")
+    if index == 0 and confidence_score > 0.60:
         st.success(
             f"👤 **Identidad confirmada:** Hola {nombre_clase.capitalize()} ({confidence_score:.0%} de confianza)"
         )
         es_sebastian = True
     else:
         st.error(
-            f"🚫 **Acceso denegado:** No se detectó a Sebastián ({confidence_score:.0%} de certeza como '{nombre_clase}')"
+            f"🚫 **Acceso denegado:** No se detectó a Sebastián (Registrado como '{nombre_clase}' con {confidence_score:.0%} de certeza)"
         )
 
 # --- PASO 2: FORMULARIO DE REGISTRO CONDICIONAL ---
