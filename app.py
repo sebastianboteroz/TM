@@ -25,13 +25,6 @@ st.write(
     "Para iniciar el registro, primero debemos verificar tu identidad usando la cámara."
 )
 
-# Imagen decorativa (opcional, tu archivo OIG5.jpg)
-try:
-    image = Image.open("OIG5.jpg")
-    st.image(image, width=350)
-except Exception:
-    pass
-
 with st.sidebar:
     st.subheader("Verificación Biométrica")
     st.write(
